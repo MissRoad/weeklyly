@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/layui/css/modules/laydate/default/laydate.css}" rel="stylesheet"/>
+<body class="white-bg">
+<div class="row">
+
+    <!-- 页面上方导航栏-->
+    <div class="col-sm-12 search-collapse">
+        <ul class="breadcrumb">
+            <input type="hidden" id="startDate" th:value="${#dates.format(start,'yyyy-MM-dd hh:MM:ss')}">
+            <input type="hidden" id="endDate" th:value="${#dates.format(end,'yyyy-MM-dd hh:MM:ss')}">
+            <li>本周:
+                <span th:text="${#dates.format(start,'MM/dd')}"></span>-
+                <span th:text="${#dates.format(end,'MM/dd')}"></span></li>
+        </ul>
+    </div>
+
+    <!-- 周报主体str-->
+    <div class="col-sm-12 select-table table-striped">
+        <table class="table">
+            <tr>
+                <td>日期</td>
+                <td>客户/项目</td>
+                <td>作业内容</td>
+                <td>工时/h</td>
+                <td>课题\问题点</td>
+                <td></td>
+            </tr>
+
+        </table>
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group" style="float: right">
+            <a class="btn btn-success" onclick="addLine()">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary btn-edit">
+                <i class="fa fa-check"></i> 提交
+            </a>
+        </div>
+    </div>
+    <!-- 周报主体end-->
+</div>
+
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/layui/lay/modules/laydate.js}"></script>
+<script type="text/javascript">
+
+    $(function () {
+        addLine();
+    })
+
+
+    /**
+     * 添加一行
+     */
+    function addLine() {
+        var num = $("table").find("tr").length;
+        if (num > 8) {
+            $.modal.alertError("最多只能添加七个工作日");
+            return false;
+        }
+        var html = '<tr>\n' +
+            '                <td>\n' +
+            '                    <input type="text" class="time-input"  id="now'+num+'" placeholder="日期"  readonly>\n' +
+            '                </td>\n' +
+            '                <td>\n' +
+            '                    <input type="text" class="form-control" aria-describedby="sizing-addon3" placeholder="客户/项目">\n' +
+            '                </td>\n' +
+            '                <td>\n' +
+            '                    <textarea class="form-control" rows="3" placeholder="作业内容"></textarea>\n' +
+            '                </td>\n' +
+            '                <td>\n' +
+            '                    <input type="text" class="form-control" aria-describedby="sizing-addon3" placeholder="工时">\n' +
+            '                </td>\n' +
+            '                <td>\n' +
+            '                    <textarea class="form-control" rows="3" placeholder="课题,问题点"></textarea>\n' +
+            '                </td>\n' +
+            '                <td>\n' +
+            '                    <a class="btn btn-danger btn-xs" onclick="delLine(this)">\n' +
+            '                        <i class="fa fa-remove"></i> 删除\n' +
+            '                    </a>\n' +
+            '                </td>\n' +
+            '            </tr>';
+        $(".table").append(html);
+        laydate.render({
+            elem:'#row'+length
+        })
+    }
+
+    /**
+     * 删除当前行
+     */
+    function delLine(that) {
+        $(that).parent().parent().remove();
+    }
+
+    /**
+     * 日期控件初始化
+     * @type {{path, set, v, ready, index, config}|string}
+     */
+
+    // layui.use('laydate',function () {
+    //     var laydate=layui.laydate;
+    //     var str=$('#startDate').val();
+    //     var end=$('#endDate').val();
+    //     var time={
+    //         min:str,
+    //         max:end,
+    //         type:'datetime'
+    //     };
+    //     $('.time-input').click(function () {
+    //         time.elem=$(this).attr('id');
+    //         laydate(time);
+    //     });
+    // });
+</script>
+</body>
+</html>

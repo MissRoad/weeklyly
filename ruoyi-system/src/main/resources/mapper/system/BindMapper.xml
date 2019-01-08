@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BindMapper">
+    
+    <resultMap type="Bind" id="BindResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="flUserCode"    column="fl_user_code"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectBindVo">
+        select id, openid, nick_name, fl_user_code, create_time, update_time from fl_bind
+    </sql>
+	
+    <select id="selectBindList" parameterType="Bind" resultMap="BindResult">
+        <include refid="selectBindVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="openid != null  and openid != '' "> and openid = #{openid}</if>
+             <if test="nickName != null  and nickName != '' "> and nick_name = #{nickName}</if>
+             <if test="flUserCode != null  and flUserCode != '' "> and fl_user_code = #{flUserCode}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectBindById" parameterType="Integer" resultMap="BindResult">
+        <include refid="selectBindVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBind" parameterType="Bind">
+        insert into fl_bind
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="openid != null  and openid != ''  ">openid,</if>
+			<if test="nickName != null  and nickName != ''  ">nick_name,</if>
+			<if test="flUserCode != null  and flUserCode != ''  ">fl_user_code,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="updateTime != null  ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="openid != null  and openid != ''  ">#{openid},</if>
+			<if test="nickName != null  and nickName != ''  ">#{nickName},</if>
+			<if test="flUserCode != null  and flUserCode != ''  ">#{flUserCode},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateBind" parameterType="Bind">
+        update fl_bind
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openid != null  and openid != ''  ">openid = #{openid},</if>
+            <if test="nickName != null  and nickName != ''  ">nick_name = #{nickName},</if>
+            <if test="flUserCode != null  and flUserCode != ''  ">fl_user_code = #{flUserCode},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteBindById" parameterType="Integer">
+        delete from fl_bind where id = #{id}
+    </delete>
+	
+    <delete id="deleteBindByIds" parameterType="String">
+        delete from fl_bind where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
