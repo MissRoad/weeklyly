@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<link th:href="@{/lay/layui/css/layui.css}" rel="stylesheet"/>
+
+<body class="white-bg">
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+    <legend>周报</legend>
+</fieldset>
+<ul class="layui-timeline">
+    <li class="layui-timeline-item">
+        <i class="layui-icon layui-timeline-axis"></i>
+        <div class="layui-timeline-content layui-text">
+            <h3 class="layui-timeline-title">2019年1月</h3>
+            <div class="layui-btn-container">
+                <a href="javaScript:0" class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
+                <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
+                <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
+            </div>
+        </div>
+    </li>
+
+    <li class="layui-timeline-item">
+        <i class="layui-icon layui-timeline-axis"></i>
+        <div class="layui-timeline-content layui-text">
+            <h3 class="layui-timeline-title">2019年2月</h3>
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-primary layui-btn-sm">张三</button>
+                <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
+                <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
+            </div>
+        </div>
+    </li>
+</ul>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/lay/layui/layui.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        /**
+         * 点击姓名打开弹出层
+         */
+        $('.layui-btn').click(function () {
+            layui.use('layer',function () {
+                var layer = layui.layer;
+                layer.open({
+                    type: 2,
+                    title: '张三',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['700px', '500px'],
+                    content: '[[@{/weekly/detail}]]'
+                });
+            });
+        });
+    })
+</script>
+</body>
+</html>

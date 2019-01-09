@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.WeeklyMapper">
+    
+    <resultMap type="Weekly" id="WeeklyResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="weekType"    column="week_type"    />
+        <result property="time"    column="time"    />
+        <result property="project"    column="project"    />
+        <result property="description"    column="description"    />
+        <result property="workHours"    column="work_hours"    />
+        <result property="sort"    column="sort"    />
+        <result property="addTime"    column="add_time"    />
+        <result property="insertTime"    column="insert_time"    />
+    </resultMap>
+	
+	<sql id="selectWeeklyVo">
+        select id, uid, week_type, time, project, description, work_hours, sort, add_time, insert_time from weekly
+    </sql>
+	
+    <select id="selectWeeklyList" parameterType="Weekly" resultMap="WeeklyResult">
+        <include refid="selectWeeklyVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="uid != null "> and uid = #{uid}</if>
+             <if test="weekType != null "> and week_type = #{weekType}</if>
+             <if test="time != null "> and time = #{time}</if>
+             <if test="project != null  and project != '' "> and project = #{project}</if>
+             <if test="description != null  and description != '' "> and description = #{description}</if>
+             <if test="workHours != null "> and work_hours = #{workHours}</if>
+             <if test="sort != null "> and sort = #{sort}</if>
+             <if test="addTime != null "> and add_time = #{addTime}</if>
+             <if test="insertTime != null "> and insert_time = #{insertTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectWeeklyById" parameterType="Integer" resultMap="WeeklyResult">
+        <include refid="selectWeeklyVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeekly" parameterType="Weekly">
+        insert into weekly
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="uid != null  ">uid,</if>
+			<if test="weekType != null  ">week_type,</if>
+			<if test="time != null  ">time,</if>
+			<if test="project != null  and project != ''  ">project,</if>
+			<if test="description != null  and description != ''  ">description,</if>
+			<if test="workHours != null  ">work_hours,</if>
+			<if test="sort != null  ">sort,</if>
+			<if test="addTime != null  ">add_time,</if>
+			<if test="insertTime != null  ">insert_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="uid != null  ">#{uid},</if>
+			<if test="weekType != null  ">#{weekType},</if>
+			<if test="time != null  ">#{time},</if>
+			<if test="project != null  and project != ''  ">#{project},</if>
+			<if test="description != null  and description != ''  ">#{description},</if>
+			<if test="workHours != null  ">#{workHours},</if>
+			<if test="sort != null  ">#{sort},</if>
+			<if test="addTime != null  ">#{addTime},</if>
+			<if test="insertTime != null  ">#{insertTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateWeekly" parameterType="Weekly">
+        update weekly
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null  ">uid = #{uid},</if>
+            <if test="weekType != null  ">week_type = #{weekType},</if>
+            <if test="time != null  ">time = #{time},</if>
+            <if test="project != null  and project != ''  ">project = #{project},</if>
+            <if test="description != null  and description != ''  ">description = #{description},</if>
+            <if test="workHours != null  ">work_hours = #{workHours},</if>
+            <if test="sort != null  ">sort = #{sort},</if>
+            <if test="addTime != null  ">add_time = #{addTime},</if>
+            <if test="insertTime != null  ">insert_time = #{insertTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteWeeklyById" parameterType="Integer">
+        delete from weekly where id = #{id}
+    </delete>
+	
+    <delete id="deleteWeeklyByIds" parameterType="String">
+        delete from weekly where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
