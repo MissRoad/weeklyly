@@ -15,6 +15,7 @@ import java.util.List;
  * (DateUtils.getDayBegin());System.out.println(todayBegin );//输出结果为2017-10-26
  * 00:00:00
  */
+
 /**
  * 日期工具类
  */
@@ -258,7 +259,7 @@ public class DateUtilsPlus {
 
     // 返回某月该季度的第一个月
     public static Date getFirstSeasonDate(Date date) {
-        final int[] SEASON = { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
+        final int[] SEASON = {1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int sean = SEASON[cal.get(Calendar.MONTH)];
@@ -283,7 +284,7 @@ public class DateUtilsPlus {
     }
 
     // 获取某年某月到某年某月按天的切片日期集合(间隔天数的集合)
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static List getTimeList(int beginYear, int beginMonth, int endYear,
                                    int endMonth, int k) {
         List list = new ArrayList();
@@ -310,7 +311,7 @@ public class DateUtilsPlus {
     }
 
     // 获取某年某月按天切片日期集合(某个月间隔多少天的日期集合)
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static List getTimeList(int beginYear, int beginMonth, int k) {
         List list = new ArrayList();
         Calendar begincal = new GregorianCalendar(beginYear, beginMonth, 1);
@@ -324,4 +325,15 @@ public class DateUtilsPlus {
         return list;
     }
 
+    /**
+     * 获取当前工作日是本月第几周
+     *
+     * @return
+     */
+    public static int getWeekOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        return calendar.get(Calendar.WEEK_OF_MONTH);
+    }
 }

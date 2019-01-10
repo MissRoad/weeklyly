@@ -1,7 +1,9 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.Weekly;
-import java.util.List;	
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 周报 数据层
@@ -58,5 +60,11 @@ public interface WeeklyMapper
      * @return 结果
      */
 	public int deleteWeeklyByIds(String[] ids);
-	
+
+	/**
+	 * 批量添加周报
+	 * @param lists
+	 * @return
+	 */
+	public int batchInsertWeekly(@Param("lists") List<Weekly> lists);
 }

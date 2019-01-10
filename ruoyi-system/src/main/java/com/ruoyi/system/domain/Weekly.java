@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.base.BaseEntity;
@@ -11,7 +12,7 @@ import java.util.Date;
  * @author ruoyi
  * @date 2019-01-09
  */
-public class Weekly extends BaseEntity
+public class Weekly
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -22,6 +23,7 @@ public class Weekly extends BaseEntity
 	/** 当前周为本月第几周； */
 	private Integer weekType;
 	/** 日期 */
+	@JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
 	private Date time;
 	/** 客户/项目 */
 	private String project;
@@ -35,6 +37,8 @@ public class Weekly extends BaseEntity
 	private Date addTime;
 	/** 更新时间 */
 	private Date insertTime;
+	/**课题\问题点	**/
+	private String problem;
 
 	public void setId(Integer id) 
 	{
@@ -127,7 +131,15 @@ public class Weekly extends BaseEntity
 		return insertTime;
 	}
 
-    public String toString() {
+	public String getProblem() {
+		return problem;
+	}
+
+	public void setProblem(String problem) {
+		this.problem = problem;
+	}
+
+	public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
             .append("uid", getUid())

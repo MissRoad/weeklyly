@@ -1,50 +1,92 @@
 <!DOCTYPE HTML>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <meta charset="utf-8">
+<head th:include="include :: header"></head>
+<script th:src="@{/ajax/libs/laydate/laydate.js}"></script>
 <link th:href="@{/lay/layui/css/layui.css}" rel="stylesheet"/>
-
-<body class="white-bg">
-<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
-    <legend>周报</legend>
-</fieldset>
-<ul class="layui-timeline">
-    <li class="layui-timeline-item">
-        <i class="layui-icon layui-timeline-axis"></i>
-        <div class="layui-timeline-content layui-text">
-            <h3 class="layui-timeline-title">2019年1月</h3>
-            <div class="layui-btn-container">
-                <a href="javaScript:0" class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
-                <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
-                <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
-            </div>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            员工姓名：<input type="text" style="width: 100px" name="menuName"/>
+                        </li>
+                        <li>
+                            月份:<input type="text" style="width: 100px"  id="month-select" name="month"/>
+                        </li>
+                        <li>
+                            部门：<select name="depName">
+                                    <option value="">所有</option>
+                                    <option value="0">系统部</option>
+                                    <option value="1">人事部</option>
+                                 </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
         </div>
-    </li>
 
-    <li class="layui-timeline-item">
-        <i class="layui-icon layui-timeline-axis"></i>
-        <div class="layui-timeline-content layui-text">
-            <h3 class="layui-timeline-title">2019年2月</h3>
-            <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-primary layui-btn-sm">张三</button>
-                <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
-                <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
-            </div>
+        <div class="col-sm-12 select-table table-striped">
+            <ul class="layui-timeline">
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                        <h3 class="layui-timeline-title">2019年1月</h3>
+                        <div class="layui-btn-container">
+                            <a href="javaScript:0" class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                        <h3 class="layui-timeline-title">2019年2月</h3>
+                        <div class="layui-btn-container">
+                            <button class="layui-btn layui-btn-primary layui-btn-sm">张三</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
-    </li>
-</ul>
-<script th:src="@{/js/jquery.min.js}"></script>
+
+    </div>
+</div>
+
+
+<div th:include="include :: footer"></div>
 <script th:src="@{/lay/layui/layui.js}"></script>
 <script type="text/javascript">
     $(function () {
         /**
+         * 日期控件
+         */
+        laydate.render({
+            elem: '#month-select'
+            , type: 'month'
+        });
+
+        /**
          * 点击姓名打开弹出层
          */
         $('.layui-btn').click(function () {
-            layui.use('layer',function () {
+            layui.use('layer', function () {
                 var layer = layui.layer;
                 layer.open({
                     type: 2,
-                    title: '张三',
+                    title: '张三一月份周报',
                     shadeClose: true,
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
@@ -53,6 +95,7 @@
                 });
             });
         });
+
     })
 </script>
 </body>

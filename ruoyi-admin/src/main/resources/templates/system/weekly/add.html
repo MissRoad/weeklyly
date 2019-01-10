@@ -17,34 +17,37 @@
         </ul>
     </div>
 
-    <!-- 周报主体str-->
-    <div class="col-sm-12 select-table table-striped">
-        <table class="table">
-            <tr>
-                <td width="10%">日期</td>
-                <td>客户/项目</td>
-                <td>作业内容</td>
-                <td>工时/h</td>
-                <td>课题\问题点</td>
-                <td></td>
-            </tr>
+        <!-- 周报主体str-->
+        <div class="col-sm-12 select-table table-striped">
+            <table class="table" id="week-table">
+                <tr>
+                    <td width="10%">日期</td>
+                    <td>客户/项目</td>
+                    <td>作业内容</td>
+                    <td>工时/h</td>
+                    <td>课题\问题点</td>
+                    <td></td>
+                </tr>
 
-        </table>
-        <div class="btn-group-sm hidden-xs" id="toolbar" role="group" style="float: right">
-            <a class="btn btn-success" onclick="addLine()">
-                <i class="fa fa-plus"></i> 添加
-            </a>
-            <a class="btn btn-primary btn-edit">
-                <i class="fa fa-check"></i> 提交
-            </a>
+            </table>
+            <div class="btn-group-sm hidden-xs" id="toolbar" role="group" style="float: right">
+                <a class="btn btn-success" onclick="addLine()">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary btn-edit" onclick="save()">
+                    <i class="fa fa-check"></i> 提交
+                </a>
+            </div>
         </div>
+        <!-- 周报主体end-->
     </div>
-    <!-- 周报主体end-->
+
 </div>
 
 <div th:include="include::footer"></div>
 <script type="text/javascript">
-
+    var str = $('#startDate').val();
+    var end = $('#endDate').val();
     $(function () {
         addLine();
     })
@@ -60,19 +63,19 @@
         }
         var html = '<tr>\n' +
             '                <td>\n' +
-            '                    <input type="text" style="width: 100px" class="date-input"  id="now'+num+'" placeholder="日期" onfocus="initDate()"  readonly>\n' +
+            '                    <input type="text" style="width: 100px" class="date-input"  id="now' + num + '" placeholder="日期" onfocus="initDate()"  readonly>\n' +
             '                </td>\n' +
             '                <td>\n' +
             '                    <input type="text" style="width: 150px" class="form-control" aria-describedby="sizing-addon3" placeholder="客户/项目">\n' +
             '                </td>\n' +
             '                <td>\n' +
-            '                    <textarea class="form-control" rows="3" placeholder="作业内容"></textarea>\n' +
+            '                    <textarea class="form-control" rows="3" maxlength="2000" placeholder="作业内容"></textarea>\n' +
             '                </td>\n' +
             '                <td>\n' +
             '                    <input type="number" min="0" style="width: 150px" class="form-control" aria-describedby="sizing-addon3" placeholder="工时">\n' +
             '                </td>\n' +
             '                <td>\n' +
-            '                    <textarea class="form-control" rows="3" placeholder="课题,问题点"></textarea>\n' +
+            '                    <textarea class="form-control" rows="3" maxlength="2000" placeholder="课题,问题点"></textarea>\n' +
             '                </td>\n' +
             '                <td>\n' +
             '                    <a class="btn btn-danger btn-xs" onclick="delLine(this)">\n' +
@@ -82,7 +85,7 @@
             '            </tr>';
         $(".table").append(html);
         laydate.render({
-            elem:'#row'+length
+            elem: '#row' + length
         })
     }
 
@@ -106,18 +109,70 @@
      * 日期控件初始化
      * @type {{path, set, v, ready, index, config}|string}
      */
-    var str=$('#startDate').val();
-    var end=$('#endDate').val();
     function initDate() {
-        lay('.date-input').each(function(){
+        lay('.date-input').each(function () {
             laydate.render({
-                min:str,
-                max:end,
+                min: str,
+                max: end,
                 elem: this,
                 theme: 'molv',
                 trigger: 'click'
             });
         });
+    }
+
+    /**
+     * 保存表单内容
+     */
+    function save() {
+        var itemList=new Array();
+        var sort=0;
+        $('#week-table tr:gt('+sort+')').each(function (n, value) {
+            sort++;
+            var item=new Object();
+            item.sort=sort;
+            item.weekType=[[${weekType}]]
+            itemList[n]=item;
+            $(this).find('td').each(function (n, value) {
+                switch (n) {
+                    case 0://日期
+                        item.time = $(this).find("input").val();
+                        break;
+                    case 1://客户项目
+                        item.project = $(this).find("input").val();
+                        break;
+                    case 2://作业内容
+                        item.description = $(this).find("textarea").val();
+                        item.description = item.description.replace(new RegExp("\n", "gm"), "<br/>");
+                        break;
+                    case 3://工时
+                        item.workHours = $(this).find("input").val();
+                        break;
+                    case 4: //课题、问题点
+                        item.problem = $(this).find("textarea").val();
+                        item.problem = item.problem.replace(new RegExp("\n", "gm"), "<br/>");
+                        break;
+                }
+            })
+        });
+        if(itemList.length == 0){
+            $.modal.alertError("请填写周报内容后再提交");
+            return false;
+        }
+        console.log(itemList);
+        console.log(JSON.stringify(itemList))
+        $.ajax({
+            data:JSON.stringify(itemList),
+            dataType:'JSON',
+            url:'[[@{/weekly/save}]]',
+            type:'POST',
+            contentType:'application/json',
+            success:function (res) {
+                if (res.code==0){
+                    $.modal.alertSuccess("成功！")
+                }
+            }
+        })
     }
 </script>
 </body>
