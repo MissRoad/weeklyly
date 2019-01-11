@@ -26,6 +26,7 @@
 		<swagger.version>2.7.0</swagger.version>
 		<pagehelper.boot.version>1.2.5</pagehelper.boot.version>
 		<oshi.version>3.9.1</oshi.version>
+		<guava.version>25.1-jre</guava.version>
 	</properties>
 	
     <dependencyManagement>
@@ -88,6 +89,14 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+
+		<!--guava-->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+
 
 	</dependencies>
 

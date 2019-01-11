@@ -1,6 +1,9 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.system.domain.Weekly;
+import com.ruoyi.system.dto.WeeklyDto;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,11 +24,13 @@ public interface IWeeklyService
 	
 	/**
      * 查询周报列表
-     * 
-     * @param weekly 周报信息
-     * @return 周报集合
+     *
+	 * @param uid uid
+	 * @param startDate 开始时间
+	 * @param endDate 结束时间
+	 * @return 周报集合
      */
-	public List<Weekly> selectWeeklyList(Weekly weekly);
+	public List<Weekly> selectWeeklyList(Integer uid, Date startDate,Date endDate);
 	
 	/**
      * 新增周报
@@ -50,5 +55,19 @@ public interface IWeeklyService
      * @return 结果
      */
 	public int deleteWeeklyByIds(String ids);
-	
+
+	/**
+	 * 添加周报
+	 * @param list 集合
+	 * @param uid 用户id
+	 * @return
+	 */
+	public boolean batchInsertWeekly(List<Weekly> list,Integer uid);
+
+	/**
+	 * 周报展示页面周报查询
+	 * @param weeklyDto
+	 * @return
+	 */
+	public List<WeeklyDto> getWeekLy(WeeklyDto weeklyDto);
 }

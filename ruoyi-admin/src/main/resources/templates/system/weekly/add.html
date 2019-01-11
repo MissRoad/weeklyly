@@ -4,43 +4,67 @@
 <head th:include="include :: header"></head>
 <script th:src="@{/ajax/libs/laydate/laydate.js}"></script>
 <body class="white-bg">
-<div class="row">
+
+<div class="container-div">
+
+        <div class="row">
 
     <!-- 页面上方导航栏-->
     <div class="col-sm-12 search-collapse">
         <ul class="breadcrumb">
             <input type="hidden" id="startDate" th:value="${#dates.format(start,'yyyy-MM-dd hh:MM:ss')}">
             <input type="hidden" id="endDate" th:value="${#dates.format(end,'yyyy-MM-dd hh:MM:ss')}">
+            <input type="hidden" id="hasWeek" th:value="#{hasWeekly}">
             <li>本周:
                 <span th:text="${#dates.format(start,'MM/dd')}"></span>-
                 <span th:text="${#dates.format(end,'MM/dd')}"></span></li>
         </ul>
     </div>
 
-        <!-- 周报主体str-->
-        <div class="col-sm-12 select-table table-striped">
-            <table class="table" id="week-table">
-                <tr>
-                    <td width="10%">日期</td>
-                    <td>客户/项目</td>
-                    <td>作业内容</td>
-                    <td>工时/h</td>
-                    <td>课题\问题点</td>
-                    <td></td>
-                </tr>
+    <!-- 周报主体str-->
+    <div class="col-sm-12 select-table table-striped">
+        <table class="table" id="week-table">
+            <tr>
+                <td width="10%">日期</td>
+                <td>客户\项目</td>
+                <td>作业内容</td>
+                <td>工时/h</td>
+                <td>课题\问题点</td>
+                <td></td>
+            </tr>
+            <tr th:each="week : ${weekly}">
+                <td>
+                    <input type="text" style="width: 100px" class="date-input" th:value="${#dates.format(week.time,'yyyy-MM-dd')}" th:id="${weekStat.index}" placeholder="日期" onfocus="initDate()"  readonly>
+                </td>
+                <td>
+                    <input type="text" style="width: 150px" class="form-control" th:value="${week.project}" aria-describedby="sizing-addon3" placeholder="客户/项目">
+                </td>
+                <td>
+                    <textarea class="form-control" rows="3" maxlength="2000" th:text="${week.description}" placeholder="作业内容"></textarea>
+                </td>
+                <td>
+                    <input type="number" min="0" style="width: 150px" th:value="${week.workHours}" class="form-control" aria-describedby="sizing-addon3" placeholder="工时">
+                </td>
+                <td>
+                    <textarea class="form-control" rows="3" maxlength="2000" th:text="${week.problem}" placeholder="课题,问题点"></textarea>
+                </td>
+                <td>
+                    <a class="btn btn-danger btn-xs" onclick="delLine(this)"><i class="fa fa-remove"></i> 删除</a>
+                </td>
+            </tr>
 
-            </table>
-            <div class="btn-group-sm hidden-xs" id="toolbar" role="group" style="float: right">
-                <a class="btn btn-success" onclick="addLine()">
-                    <i class="fa fa-plus"></i> 添加
-                </a>
-                <a class="btn btn-primary btn-edit" onclick="save()">
-                    <i class="fa fa-check"></i> 提交
-                </a>
-            </div>
+        </table>
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group" style="float: right">
+            <a class="btn btn-success" onclick="addLine()">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary btn-edit" onclick="save()">
+                <i class="fa fa-check"></i> 提交
+            </a>
         </div>
-        <!-- 周报主体end-->
     </div>
+    <!-- 周报主体end-->
+        </div>
 
 </div>
 
@@ -48,8 +72,11 @@
 <script type="text/javascript">
     var str = $('#startDate').val();
     var end = $('#endDate').val();
+    var hasWeek = $('#hasWeek').val();
     $(function () {
-        addLine();
+        if (!hasWeek) {
+            addLine();
+        }
     })
 
     /**
@@ -125,14 +152,14 @@
      * 保存表单内容
      */
     function save() {
-        var itemList=new Array();
-        var sort=0;
-        $('#week-table tr:gt('+sort+')').each(function (n, value) {
+        var itemList = new Array();
+        var sort = 0;
+        $('#week-table tr:gt(' + sort + ')').each(function (n, value) {
             sort++;
-            var item=new Object();
-            item.sort=sort;
-            item.weekType=[[${weekType}]]
-            itemList[n]=item;
+            var item = new Object();
+            item.sort = sort;
+            item.weekType = [[${weekType}]]
+            itemList[n] = item;
             $(this).find('td').each(function (n, value) {
                 switch (n) {
                     case 0://日期
@@ -155,21 +182,22 @@
                 }
             })
         });
-        if(itemList.length == 0){
+        if (itemList.length == 0) {
             $.modal.alertError("请填写周报内容后再提交");
             return false;
         }
-        console.log(itemList);
-        console.log(JSON.stringify(itemList))
+
         $.ajax({
-            data:JSON.stringify(itemList),
-            dataType:'JSON',
-            url:'[[@{/weekly/save}]]',
-            type:'POST',
-            contentType:'application/json',
-            success:function (res) {
-                if (res.code==0){
-                    $.modal.alertSuccess("成功！")
+            data: JSON.stringify(itemList),
+            dataType: 'JSON',
+            url: '[[@{/weekly/save}]]',
+            type: 'POST',
+            contentType: 'application/json',
+            success: function (res) {
+                if (res.code == 0) {
+                    $.modal.alertSuccess("周报提交成功！")
+                } else {
+                    $.modal.alertError(res)
                 }
             }
         })

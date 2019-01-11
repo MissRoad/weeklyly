@@ -14,27 +14,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="workHours"    column="work_hours"    />
         <result property="sort"    column="sort"    />
         <result property="addTime"    column="add_time"    />
-        <result property="insertTime"    column="insert_time"    />
+        <result property="updateTime"    column="update_time"    />
         <result property="problem"    column="problem"    />
     </resultMap>
 	
 	<sql id="selectWeeklyVo">
-        select id, uid, week_type, time, project, description, work_hours, sort, add_time, insert_time from weekly
+        select id, uid, week_type, time, project, description, problem,work_hours, sort, add_time, update_time from weekly
     </sql>
 
-    <select id="selectWeeklyList" parameterType="com.ruoyi.system.domain.Weekly" resultMap="WeeklyResult">
+    <select id="selectWeeklyList" resultMap="WeeklyResult">
         <include refid="selectWeeklyVo"/>
         <where>  
-            <if test="id != null "> and id = #{id}</if>
              <if test="uid != null "> and uid = #{uid}</if>
-             <if test="weekType != null "> and week_type = #{weekType}</if>
-             <if test="time != null "> and time = #{time}</if>
-             <if test="project != null  and project != '' "> and project = #{project}</if>
-             <if test="description != null  and description != '' "> and description = #{description}</if>
-             <if test="workHours != null "> and work_hours = #{workHours}</if>
-             <if test="sort != null "> and sort = #{sort}</if>
-             <if test="addTime != null "> and add_time = #{addTime}</if>
-             <if test="insertTime != null "> and insert_time = #{insertTime}</if>
+              and time &gt;= #{startDate} and time &lt;= #{endDate}
          </where>
     </select>
     
@@ -46,7 +38,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertWeekly" parameterType="com.ruoyi.system.domain.Weekly">
         insert into weekly
 		<trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="id != null  ">id,</if>
 			<if test="uid != null  ">uid,</if>
 			<if test="weekType != null  ">week_type,</if>
 			<if test="time != null  ">time,</if>
@@ -54,11 +45,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="description != null  and description != ''  ">description,</if>
 			<if test="workHours != null  ">work_hours,</if>
 			<if test="sort != null  ">sort,</if>
-			<if test="addTime != null  ">add_time,</if>
-			<if test="insertTime != null  ">insert_time,</if>
+		    <if test="problem !=null">problem,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-			<if test="id != null  ">#{id},</if>
 			<if test="uid != null  ">#{uid},</if>
 			<if test="weekType != null  ">#{weekType},</if>
 			<if test="time != null  ">#{time},</if>
@@ -66,8 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="description != null  and description != ''  ">#{description},</if>
 			<if test="workHours != null  ">#{workHours},</if>
 			<if test="sort != null  ">#{sort},</if>
-			<if test="addTime != null  ">#{addTime},</if>
-			<if test="insertTime != null  ">#{insertTime},</if>
+            <if test="problem !=null">#{problem},</if>
          </trim>
     </insert>
 	 
@@ -81,8 +69,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="description != null  and description != ''  ">description = #{description},</if>
             <if test="workHours != null  ">work_hours = #{workHours},</if>
             <if test="sort != null  ">sort = #{sort},</if>
-            <if test="addTime != null  ">add_time = #{addTime},</if>
-            <if test="insertTime != null  ">insert_time = #{insertTime},</if>
         </trim>
         where id = #{id}
     </update>
@@ -98,28 +84,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
-    <insert id="batchInsertWeekly" parameterType="list">
-        <foreach item="week" collection="lists" index="weekLists" separator=";">
-            insert into weekly
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="week.uid != null  ">uid,</if>
-                <if test="week.weekType != null  ">week_type,</if>
-                <if test="week.time != null  ">time,</if>
-                <if test="week.project != null  and project != ''  ">project,</if>
-                <if test="week.description != null  and description != ''  ">description,</if>
-                <if test="week.workHours != null  ">work_hours,</if>
-                <if test="week.sort != null  ">sort</if>
-            </trim>
-            <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="week.uid != null  ">#{week.uid},</if>
-                <if test="weekType != null  ">#{week.weekType},</if>
-                <if test="week.time != null  ">#{week.time},</if>
-                <if test="week.project != null  and project != ''  ">#{week.project},</if>
-                <if test="week.description != null  and description != ''  ">#{week.description},</if>
-                <if test="week.workHours != null  ">#{week.workHours},</if>
-                <if test="week.sort != null  ">#{week.sort}</if>
-            </trim>
-        </foreach>
-    </insert>
+    <select id="selectWeekly" parameterType="com.ruoyi.system.dto.WeeklyDto" resultType="com.ruoyi.system.dto.WeeklyDto">
+        SELECT
+            w.uid,
+            w.time,
+            s.user_name AS name,
+            w.week_type AS weekType,
+            s.dept_id as departmentId,
+            w.project,
+            w.description,
+            w.work_hours AS workHours,
+            W.problem
+        FROM sys_user AS s
+          INNER JOIN weekly AS w ON w.uid=s.user_id
+        WHERE 1=1
+        <if test="name!= null and name!=''">
+            AND INSTR(s.user_name,#{name})
+        </if>
+
+        <if test="departmentId!=null and departmentId!=''">
+            AND s.dept_id=#{departmentId}
+        </if>
+
+        <if test="month!=null and month!=''">
+            AND DATE_FORMAT(w.time, '%Y%m' ) =#{month}
+        </if>
+
+        <if test="uid!=null and uid!=''">
+            AND w.uid=#{uid}
+            ORDER BY w.sort
+        </if>
+    </select>
     
 </mapper>

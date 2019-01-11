@@ -1,12 +1,12 @@
 package com.ruoyi.web.controller.weekly;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import com.ruoyi.common.base.AjaxResult;
-import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.DateUtilsPlus;
 import com.ruoyi.framework.web.base.BaseController;
 import com.ruoyi.system.domain.Weekly;
-import com.ruoyi.system.mapper.WeeklyMapper;
+import com.ruoyi.system.dto.WeeklyDto;
+import com.ruoyi.system.service.IWeeklyService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,8 @@ import java.util.List;
 @Slf4j
 public class WeeklyController extends BaseController {
     private String prefix = "system/weekly";
-
     @Autowired
-    private WeeklyMapper weeklyMapper;
+    private IWeeklyService weeklyService;
 
     /**
      * 添加周报页面
@@ -35,10 +34,19 @@ public class WeeklyController extends BaseController {
     @RequiresPermissions("system:weekly:view")
     @GetMapping()
     public String weekly(Model model) {
-        Date endDayOfWeek = DateUtilsPlus.getEndDayOfWeek();
-        model.addAttribute("start", DateUtilsPlus.getBeginDayOfWeek());
-        model.addAttribute("end", endDayOfWeek);
-        model.addAttribute("weekType", DateUtilsPlus.getWeekOfMonth(endDayOfWeek));
+        Date start = DateUtilsPlus.getBeginDayOfWeek();
+        Date end = DateUtilsPlus.getEndDayOfWeek();
+        int weekType = DateUtilsPlus.getWeekOfMonth(end);
+        List<Weekly> weeklies = weeklyService.selectWeeklyList(getUserId().intValue(), start, end);
+        if (weeklies.isEmpty()) {
+            model.addAttribute("hasWeekly", "0");
+        } else {
+            model.addAttribute("hasWeekly", "1");
+        }
+        model.addAttribute("weekly", weeklies);
+        model.addAttribute("start", start);
+        model.addAttribute("end", end);
+        model.addAttribute("weekType", weekType);
         return prefix + "/add";
     }
 
@@ -49,8 +57,17 @@ public class WeeklyController extends BaseController {
      */
     @RequiresPermissions("system:weekly:view")
     @GetMapping("list")
-    public String list() {
+    public String list(WeeklyDto weeklyDto, Model model) {
+        List<WeeklyDto> weekLy = weeklyService.getWeekLy(weeklyDto);
+        model.addAttribute("week", weekLy);
         return prefix + "/weekly";
+    }
+
+    @GetMapping("lists")
+    @ResponseBody
+    public List<WeeklyDto> get(WeeklyDto weeklyDto) {
+        List<WeeklyDto> weekLy = weeklyService.getWeekLy(weeklyDto);
+        return weekLy;
     }
 
     /**
@@ -70,9 +87,8 @@ public class WeeklyController extends BaseController {
      */
     @PostMapping(value = "save")
     @ResponseBody
-    public AjaxResult addWeekly(@RequestBody List<Weekly> weekly) throws JsonProcessingException {
-
-        int i = weeklyMapper.batchInsertWeekly(weekly);
-        return i > 0 ? AjaxResult.success() : AjaxResult.error();
+    public AjaxResult addWeekly(@RequestBody List<Weekly> weekly) {
+        boolean result = weeklyService.batchInsertWeekly(weekly, getUserId().intValue());
+        return result ? AjaxResult.success() : AjaxResult.error();
     }
 }

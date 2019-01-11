@@ -1,6 +1,7 @@
 package com.ruoyi.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.base.BaseEntity;
@@ -12,6 +13,7 @@ import java.util.Date;
  * @author ruoyi
  * @date 2019-01-09
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Weekly
 {
 	private static final long serialVersionUID = 1L;
@@ -36,7 +38,7 @@ public class Weekly
 	/** 插入时间 */
 	private Date addTime;
 	/** 更新时间 */
-	private Date insertTime;
+	private Date updateTime;
 	/**课题\问题点	**/
 	private String problem;
 
@@ -121,14 +123,13 @@ public class Weekly
 	{
 		return addTime;
 	}
-	public void setInsertTime(Date insertTime) 
-	{
-		this.insertTime = insertTime;
+
+	public Date getUpdateTime() {
+		return updateTime;
 	}
 
-	public Date getInsertTime() 
-	{
-		return insertTime;
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 	public String getProblem() {
@@ -150,7 +151,7 @@ public class Weekly
             .append("workHours", getWorkHours())
             .append("sort", getSort())
             .append("addTime", getAddTime())
-            .append("insertTime", getInsertTime())
+            .append("updateTime", getUpdateTime())
             .toString();
     }
 }
