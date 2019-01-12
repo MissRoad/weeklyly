@@ -94,7 +94,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             w.project,
             w.description,
             w.work_hours AS workHours,
-            W.problem
+            w.problem
         FROM sys_user AS s
           INNER JOIN weekly AS w ON w.uid=s.user_id
         WHERE 1=1
