@@ -1,0 +1,15 @@
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+    <td>
+        <select name="project-dis" id="project-dis" class="selectpicker">
+            <option>请选择</option>
+            <option th:each="proj :${projects}" th:value="${proj.generalKey}" th:text="${proj.value}"></option>
+        </select>
+    </td>
+    <td>
+        <select name="job-dis" id="job-dis" class="selectpicker">
+            <option>请选择</option>
+            <option th:each="job :${jobs}" th:value="${job.generalKey}" th:text="${job.value}"></option>
+        </select>
+    </td>
+</html>
+

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GeneralDataMapper">
+
+    <resultMap type="com.ruoyi.system.domain.GeneralData" id="DataResult">
+        <result property="id"    column="id"    />
+        <result property="type"    column="type"    />
+        <result property="generalKey"    column="general_key"    />
+        <result property="value"    column="value"    />
+        <result property="sort"    column="sort"    />
+        <result property="isDel"    column="is_del"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectDataVo">
+        select id, type, general_key, value, sort, is_del, create_time, update_time from general_data
+    </sql>
+	
+    <select id="selectDataList" parameterType="com.ruoyi.system.domain.GeneralData" resultMap="DataResult">
+        <include refid="selectDataVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="type != null  and type != '' "> and type = #{type}</if>
+             <if test="key != null  and key != '' "> and key = #{key}</if>
+             <if test="value != null  and value != '' "> and value = #{value}</if>
+             <if test="sort != null "> and sort = #{sort}</if>
+             <if test="isDel != null  and isDel != '' "> and is_del = #{isDel}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDataById" parameterType="Integer" resultMap="DataResult">
+        <include refid="selectDataVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertData" parameterType="com.ruoyi.system.domain.GeneralData">
+        insert into general_data
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="type != null  and type != ''  ">type,</if>
+			<if test="key != null  and key != ''  ">key,</if>
+			<if test="value != null  and value != ''  ">value,</if>
+			<if test="sort != null  ">sort,</if>
+			<if test="isDel != null  and isDel != ''  ">is_del,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="updateTime != null  ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="type != null  and type != ''  ">#{type},</if>
+			<if test="key != null  and key != ''  ">#{key},</if>
+			<if test="value != null  and value != ''  ">#{value},</if>
+			<if test="sort != null  ">#{sort},</if>
+			<if test="isDel != null  and isDel != ''  ">#{isDel},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateData" parameterType="com.ruoyi.system.domain.GeneralData">
+        update general_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type != null  and type != ''  ">type = #{type},</if>
+            <if test="key != null  and key != ''  ">key = #{key},</if>
+            <if test="value != null  and value != ''  ">value = #{value},</if>
+            <if test="sort != null  ">sort = #{sort},</if>
+            <if test="isDel != null  and isDel != ''  ">is_del = #{isDel},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDataById" parameterType="Integer">
+        delete from general_data where id = #{id}
+    </delete>
+	
+    <delete id="deleteDataByIds" parameterType="String">
+        delete from general_data where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectGeneralByType" resultMap="DataResult" parameterType="string">
+      <include refid="selectDataVo"/>
+      where type=#{type} and is_del=0
+    </select>
+    
+</mapper>

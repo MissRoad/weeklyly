@@ -10,6 +10,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="weekType"    column="week_type"    />
         <result property="time"    column="time"    />
         <result property="project"    column="project"    />
+        <result property="projectDist"    column="project_dist"    />
+        <result property="jobDist"    column="job_dist"    />
         <result property="description"    column="description"    />
         <result property="workHours"    column="work_hours"    />
         <result property="sort"    column="sort"    />
@@ -19,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectWeeklyVo">
-        select id, uid, week_type, time, project, description, problem,work_hours, sort, add_time, update_time from weekly
+        select id, uid, week_type, time, project,project_dist,job_dist, description, problem,work_hours, sort, add_time, update_time from weekly
     </sql>
 
     <select id="selectWeeklyList" resultMap="WeeklyResult">
@@ -46,6 +48,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="workHours != null  ">work_hours,</if>
 			<if test="sort != null  ">sort,</if>
 		    <if test="problem !=null">problem,</if>
+		    <if test="projectDist !=null">project_dist,</if>
+		    <if test="jobDist !=null">job_dist,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="uid != null  ">#{uid},</if>
@@ -56,6 +60,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="workHours != null  ">#{workHours},</if>
 			<if test="sort != null  ">#{sort},</if>
             <if test="problem !=null">#{problem},</if>
+            <if test="projectDist !=null">#{projectDist},</if>
+            <if test="jobDist !=null">#{jobDist},</if>
          </trim>
     </insert>
 	 
@@ -86,14 +92,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWeekly" parameterType="com.ruoyi.system.dto.WeeklyDto" resultType="com.ruoyi.system.dto.WeeklyDto">
         SELECT
+            s.user_name AS name,
+            s.dept_id as departmentId,
             w.uid,
             w.time,
-            s.user_name AS name,
             w.week_type AS weekType,
-            s.dept_id as departmentId,
             w.project,
             w.description,
             w.work_hours AS workHours,
+            w.project_dist AS projectDist,
+            w.job_dist AS jobDist,
             w.problem
         FROM sys_user AS s
           INNER JOIN weekly AS w ON w.uid=s.user_id

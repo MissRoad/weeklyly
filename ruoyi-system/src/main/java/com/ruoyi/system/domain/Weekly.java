@@ -29,6 +29,10 @@ public class Weekly
 	private Date time;
 	/** 客户/项目 */
 	private String project;
+	/** 项目区分 */
+	private Integer projectDist;
+	/** 作业区分 */
+	private Integer jobDist;
 	/** 作业内容 */
 	private String description;
 	/** 工时 */
@@ -138,6 +142,22 @@ public class Weekly
 
 	public void setProblem(String problem) {
 		this.problem = problem;
+	}
+
+	public Integer getProjectDist() {
+		return projectDist;
+	}
+
+	public void setProjectDist(Integer projectDist) {
+		this.projectDist = projectDist;
+	}
+
+	public Integer getJobDist() {
+		return jobDist;
+	}
+
+	public void setJobDist(Integer jobDist) {
+		this.jobDist = jobDist;
 	}
 
 	public String toString() {

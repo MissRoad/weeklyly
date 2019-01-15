@@ -5,21 +5,24 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.Weekly;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 import java.util.List;
 
-@Data
+
 /**
  * 周报查询页面
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class WeeklyDto extends Weekly {
 
     /**
      * 月份
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date month;
 
     /**

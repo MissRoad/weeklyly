@@ -1,11 +1,13 @@
 package com.ruoyi.web.controller.weekly;
 
-import com.google.common.collect.Lists;
 import com.ruoyi.common.base.AjaxResult;
+import com.ruoyi.common.constant.GeneralDataConstants;
 import com.ruoyi.common.utils.DateUtilsPlus;
 import com.ruoyi.framework.web.base.BaseController;
+import com.ruoyi.system.domain.GeneralData;
 import com.ruoyi.system.domain.Weekly;
 import com.ruoyi.system.dto.WeeklyDto;
+import com.ruoyi.system.mapper.GeneralDataMapper;
 import com.ruoyi.system.service.IWeeklyService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -24,6 +26,8 @@ public class WeeklyController extends BaseController {
     private String prefix = "system/weekly";
     @Autowired
     private IWeeklyService weeklyService;
+    @Autowired
+    private GeneralDataMapper generalDataMapper;
 
     /**
      * 添加周报页面
@@ -38,11 +42,15 @@ public class WeeklyController extends BaseController {
         Date end = DateUtilsPlus.getEndDayOfWeek();
         int weekType = DateUtilsPlus.getWeekOfMonth(end);
         List<Weekly> weeklies = weeklyService.selectWeeklyList(getUserId().intValue(), start, end);
+        List<GeneralData> projects = generalDataMapper.selectGeneralByType(GeneralDataConstants.PRO_DIS);
+        List<GeneralData> jobs = generalDataMapper.selectGeneralByType(GeneralDataConstants.JOB_DIS);
         if (weeklies.isEmpty()) {
             model.addAttribute("hasWeekly", "0");
         } else {
             model.addAttribute("hasWeekly", "1");
         }
+        model.addAttribute("projects", projects);
+        model.addAttribute("jobs", jobs);
         model.addAttribute("weekly", weeklies);
         model.addAttribute("start", start);
         model.addAttribute("end", end);
@@ -90,5 +98,20 @@ public class WeeklyController extends BaseController {
     public AjaxResult addWeekly(@RequestBody List<Weekly> weekly) {
         boolean result = weeklyService.batchInsertWeekly(weekly, getUserId().intValue());
         return result ? AjaxResult.success() : AjaxResult.error();
+    }
+
+    /**
+     * 获取表单模板
+     *
+     * @param model
+     * @return
+     */
+    @GetMapping("template")
+    public String getTemple(Model model) {
+        List<GeneralData> projects = generalDataMapper.selectGeneralByType(GeneralDataConstants.PRO_DIS);
+        List<GeneralData> jobs = generalDataMapper.selectGeneralByType(GeneralDataConstants.JOB_DIS);
+        model.addAttribute("projects", projects);
+        model.addAttribute("jobs", jobs);
+        return prefix + "/template";
     }
 }
