@@ -71,13 +71,6 @@ public class WeeklyController extends BaseController {
         return prefix + "/weekly";
     }
 
-    @GetMapping("lists")
-    @ResponseBody
-    public List<WeeklyDto> get(WeeklyDto weeklyDto) {
-        List<WeeklyDto> weekLy = weeklyService.getWeeklyDetail(weeklyDto);
-        return weekLy;
-    }
-
     /**
      * 个人周报详情页面
      *
