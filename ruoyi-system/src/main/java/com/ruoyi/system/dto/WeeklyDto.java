@@ -1,13 +1,12 @@
 package com.ruoyi.system.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.Weekly;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -22,8 +21,7 @@ public class WeeklyDto extends Weekly {
     /**
      * 月份
      */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date month;
+    private String month;
 
     /**
      * 用户
@@ -49,4 +47,14 @@ public class WeeklyDto extends Weekly {
      * 时间线
      */
     private String timeLine;
+
+    /**
+     * 第几周
+     */
+    private String week;
+
+    /**
+     * 周报
+     */
+    List<Weekly> weekly;
 }

@@ -1,11 +1,9 @@
 package com.ruoyi.common.utils;
 
+import com.google.common.collect.Maps;
+
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 /*
  * 由于为了以后使用方便,所有方法的返回类型都设为了 java.util.Date 请在使用时根据自己的需要进行日期格式化处理,如:
  *
@@ -335,5 +333,47 @@ public class DateUtilsPlus {
         calendar.setTime(date);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         return calendar.get(Calendar.WEEK_OF_MONTH);
+    }
+
+    /**
+     * 取得当前传入的时间是周几
+     *
+     * @param date
+     * @return
+     */
+    public static String getDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        int key = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        return getWhichDay(key);
+    }
+
+    public static String getWeek(Integer key) {
+        HashMap<Integer, String> week = Maps.newHashMap();
+        week.put(1, "第一周");
+        week.put(2, "第二周");
+        week.put(3, "第三周");
+        week.put(4, "第四周");
+        return week.get(key);
+    }
+
+    public static String getWhichDay(Integer key) {
+        HashMap<Integer, String> day = Maps.newHashMap();
+        day.put(1, "周一");
+        day.put(2, "周二");
+        day.put(3, "周三");
+        day.put(4, "周四");
+        day.put(5, "周五");
+        day.put(6, "周六");
+        day.put(0, "周日");
+        return day.get(key);
+    }
+
+    public static void main(String[] args) {
+        Date date = new Date();
+        date.setTime(1547444114000L);
+        String day = getDay(date);
+        System.out.println(day);
     }
 }

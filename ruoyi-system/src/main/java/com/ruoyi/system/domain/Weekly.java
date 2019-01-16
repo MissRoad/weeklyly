@@ -2,9 +2,8 @@ package com.ruoyi.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import com.ruoyi.common.base.BaseEntity;
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -14,6 +13,7 @@ import java.util.Date;
  * @date 2019-01-09
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Data
 public class Weekly
 {
 	private static final long serialVersionUID = 1L;
@@ -45,133 +45,18 @@ public class Weekly
 	private Date updateTime;
 	/**课题\问题点	**/
 	private String problem;
+	/**
+	 * 周几
+	 */
+	private String whichDay;
 
-	public void setId(Integer id) 
-	{
-		this.id = id;
-	}
+	/**
+	 * 项目区分
+	 */
+	private String projectDetail;
 
-	public Integer getId() 
-	{
-		return id;
-	}
-	public void setUid(Integer uid) 
-	{
-		this.uid = uid;
-	}
-
-	public Integer getUid() 
-	{
-		return uid;
-	}
-	public void setWeekType(Integer weekType) 
-	{
-		this.weekType = weekType;
-	}
-
-	public Integer getWeekType() 
-	{
-		return weekType;
-	}
-	public void setTime(Date time) 
-	{
-		this.time = time;
-	}
-
-	public Date getTime() 
-	{
-		return time;
-	}
-	public void setProject(String project) 
-	{
-		this.project = project;
-	}
-
-	public String getProject() 
-	{
-		return project;
-	}
-	public void setDescription(String description) 
-	{
-		this.description = description;
-	}
-
-	public String getDescription() 
-	{
-		return description;
-	}
-	public void setWorkHours(Integer workHours) 
-	{
-		this.workHours = workHours;
-	}
-
-	public Integer getWorkHours() 
-	{
-		return workHours;
-	}
-	public void setSort(Integer sort) 
-	{
-		this.sort = sort;
-	}
-
-	public Integer getSort() 
-	{
-		return sort;
-	}
-	public void setAddTime(Date addTime) 
-	{
-		this.addTime = addTime;
-	}
-
-	public Date getAddTime() 
-	{
-		return addTime;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getProblem() {
-		return problem;
-	}
-
-	public void setProblem(String problem) {
-		this.problem = problem;
-	}
-
-	public Integer getProjectDist() {
-		return projectDist;
-	}
-
-	public void setProjectDist(Integer projectDist) {
-		this.projectDist = projectDist;
-	}
-
-	public Integer getJobDist() {
-		return jobDist;
-	}
-
-	public void setJobDist(Integer jobDist) {
-		this.jobDist = jobDist;
-	}
-
-	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("uid", getUid())
-            .append("weekType", getWeekType())
-            .append("time", getTime())
-            .append("project", getProject())
-            .append("description", getDescription())
-            .append("workHours", getWorkHours())
-            .append("sort", getSort())
-            .append("addTime", getAddTime())
-            .append("updateTime", getUpdateTime())
-            .toString();
-    }
+	/**
+	 * 作业区分
+	 */
+	private String jobDetail;
 }

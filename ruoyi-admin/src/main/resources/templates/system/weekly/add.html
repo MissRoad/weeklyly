@@ -48,13 +48,13 @@
                         <td>
                             <select name="project-dis" id="project-dis" class="selectpicker">
                                 <option>请选择</option>
-                                <option th:each="proj :${projects}" th:selected="proj.generalKey eq week.projectDist"  th:value="${proj.generalKey}" th:text="${proj.value}"></option>
+                                <option th:each="proj :${projects}" th:selected="(${week.projectDist}==${proj.generalKey})"  th:value="${proj.generalKey}" th:text="${proj.value}"></option>
                             </select>
                         </td>
                         <td>
                             <select name="job-dis" id="job-dis" class="selectpicker">
                                 <option>请选择</option>
-                                <option th:each="job :${jobs}" th:value="${job.generalKey}" th:selected="proj.generalKey eq week.jobDist" th:text="${job.value}"></option>
+                                <option th:each="job :${jobs}" th:value="${job.generalKey}" th:selected="(${job.generalKey}==${week.jobDist})" th:text="${job.value}"></option>
                             </select>
                         </td>
                         <td>

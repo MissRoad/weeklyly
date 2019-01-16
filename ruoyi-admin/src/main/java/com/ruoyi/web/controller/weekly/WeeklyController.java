@@ -67,14 +67,14 @@ public class WeeklyController extends BaseController {
     @GetMapping("list")
     public String list(WeeklyDto weeklyDto, Model model) {
         List<WeeklyDto> weekLy = weeklyService.getWeekLy(weeklyDto);
-        model.addAttribute("week", weekLy);
+        model.addAttribute("weeks", weekLy);
         return prefix + "/weekly";
     }
 
     @GetMapping("lists")
     @ResponseBody
     public List<WeeklyDto> get(WeeklyDto weeklyDto) {
-        List<WeeklyDto> weekLy = weeklyService.getWeekLy(weeklyDto);
+        List<WeeklyDto> weekLy = weeklyService.getWeeklyDetail(weeklyDto);
         return weekLy;
     }
 
@@ -84,7 +84,9 @@ public class WeeklyController extends BaseController {
      * @return
      */
     @GetMapping("detail")
-    public String detail() {
+    public String detail(Model model, WeeklyDto weeklyDto) {
+        List<WeeklyDto> weekLy = weeklyService.getWeeklyDetail(weeklyDto);
+        model.addAttribute("weeks", weekLy);
         return prefix + "/detail";
     }
 

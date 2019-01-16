@@ -1,23 +1,34 @@
 package com.ruoyi.system.service.impl;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.constant.GeneralDataConstants;
+import com.ruoyi.common.json.JSONObject;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.DateUtilsPlus;
+import com.ruoyi.system.domain.GeneralData;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.Weekly;
 import com.ruoyi.system.dto.WeeklyDto;
+import com.ruoyi.system.mapper.GeneralDataMapper;
 import com.ruoyi.system.mapper.WeeklyMapper;
 import com.ruoyi.system.service.IWeeklyService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 周报 服务层实现
@@ -26,9 +37,13 @@ import java.util.List;
  * @date 2019-01-09
  */
 @Service
+@Slf4j
 public class WeeklyServiceImpl implements IWeeklyService {
     @Autowired
     private WeeklyMapper weeklyMapper;
+
+    @Autowired
+    private GeneralDataMapper generalDataMapper;
 
     /**
      * 查询周报信息
@@ -132,16 +147,53 @@ public class WeeklyServiceImpl implements IWeeklyService {
                     sysUser.setUserName(m.getName());
                     sysUser.setUserId(m.getUid().longValue());
                     sysUser.setDeptId(m.getDepartmentId().longValue());
-                }
-                if (!uid.contains(m.getUid())) {
-                    users.add(sysUser);
-                    uid.add(m.getUid());
+                    if (!uid.contains(m.getUid())) {
+                        users.add(sysUser);
+                        uid.add(m.getUid());
+                    }
                 }
             });
             week.setUser(users);
             weeklyDtoList.add(week);
         });
         return weeklyDtoList;
+    }
+
+    @Override
+    public List<WeeklyDto> getWeeklyDetail(WeeklyDto weeklyDto) {
+        List<WeeklyDto> weeklyList = weeklyMapper.selectWeekly(weeklyDto);
+        List<GeneralData> projects = generalDataMapper.selectGeneralByType(GeneralDataConstants.PRO_DIS);
+        List<GeneralData> jobs = generalDataMapper.selectGeneralByType(GeneralDataConstants.JOB_DIS);
+        List<WeeklyDto> week = Lists.newArrayList();
+        HashSet<Integer> weekDay = Sets.newHashSet();
+        weeklyList.forEach(r -> {
+            Integer weekType = r.getWeekType();
+            if (!weekDay.contains(weekType)) {
+                weekDay.add(weekType);
+            }
+        });
+        for (Integer w : weekDay) {
+            List<Weekly> list = Lists.newArrayList();
+            WeeklyDto weekly = new WeeklyDto();
+            weekly.setWeek(DateUtilsPlus.getWeek(w));
+            for (WeeklyDto t : weeklyList) {
+                Weekly w1 = new Weekly();
+                if (w.equals(t.getWeekType())) {
+                    BeanUtils.copyProperties(t, w1);
+                    w1.setWhichDay(DateUtilsPlus.getDay(w1.getTime()));
+                    jobs.stream().filter(r -> r.getGeneralKey().equals(w1.getJobDist().toString())).collect(Collectors.toList()).forEach(r -> {
+                        w1.setJobDetail(r.getValue());
+                    });
+                    projects.stream().filter(r -> r.getGeneralKey().equals(w1.getProjectDist().toString())).collect(Collectors.toList()).forEach(r -> {
+                        w1.setProjectDetail(r.getValue());
+                    });
+                    list.add(w1);
+                }
+            }
+            weekly.setWeekly(list);
+            week.add(weekly);
+        }
+        return week;
     }
 
 }

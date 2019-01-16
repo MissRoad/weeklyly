@@ -16,14 +16,14 @@
                             员工姓名：<input type="text" style="width: 100px" name="menuName"/>
                         </li>
                         <li>
-                            月份:<input type="text" style="width: 100px"  id="month-select" name="month"/>
+                            月份:<input type="text" style="width: 100px" id="month-select" name="month"/>
                         </li>
                         <li>
                             部门：<select name="depName">
-                                    <option value="">所有</option>
-                                    <option value="0">系统部</option>
-                                    <option value="1">人事部</option>
-                                 </select>
+                            <option value="">所有</option>
+                            <option value="0">系统部</option>
+                            <option value="1">人事部</option>
+                        </select>
                         </li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -36,26 +36,16 @@
 
         <div class="col-sm-12 select-table table-striped">
             <ul class="layui-timeline">
-                <li class="layui-timeline-item">
-                    <i class="layui-icon layui-timeline-axis"></i>
-                    <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">2019年1月</h3>
-                        <div class="layui-btn-container">
-                            <a href="javaScript:0" class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
-                            <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
-                            <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
-                        </div>
-                    </div>
-                </li>
 
-                <li class="layui-timeline-item">
+                <li class="layui-timeline-item" th:each="week:${weeks}">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">2019年2月</h3>
+                        <h3 class="layui-timeline-title" th:text="${week.timeLine}">2019年1月</h3>
                         <div class="layui-btn-container">
-                            <button class="layui-btn layui-btn-primary layui-btn-sm">张三</button>
-                            <button class="layui-btn layui-btn-primary layui-btn-sm">李四</button>
-                            <button class="layui-btn layui-btn-primary layui-btn-sm">王五</button>
+                            <a href="javaScript:void(0)" th:each="user:${week.user}"
+                               th:attr="data-uid=${user.userId},data-time=${week.timeLine},data-name=${user.userName}"
+                               th:text="${user.userName}"
+                               class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
                         </div>
                     </div>
                 </li>
@@ -83,16 +73,22 @@
          * 点击姓名打开弹出层
          */
         $('.layui-btn').click(function () {
+            debugger
+            var uid = $(this).data('uid');
+            var name = $(this).data('name');
+            var time = $(this).data('time');
+            var title = name + time + '周报';
+            var url = ctx + 'weekly/detail?uid=' + uid + '&month=' + time.replace('-', '');
             layui.use('layer', function () {
                 var layer = layui.layer;
                 layer.open({
                     type: 2,
-                    title: '张三一月份周报',
+                    title: title,
                     shadeClose: true,
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     area: ['700px', '500px'],
-                    content: '[[@{/weekly/detail}]]'
+                    content: url
                 });
             });
         });
