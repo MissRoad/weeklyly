@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,16 +23,11 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ruoyi.common.annotation.Excel;
@@ -508,5 +504,145 @@ public class ExcelUtil<T>
             desc.getParentFile().mkdirs();
         }
         return downloadPath;
+    }
+
+    /**
+     * 行Copy
+     */
+    public static void copyRows(XSSFSheet sht, int pRow, int intlenth) {
+
+        XSSFRow sourceRow = null;
+        XSSFRow targetRow = null;
+        XSSFCell sourceCell = null;
+        XSSFCell targetCell = null;
+
+        int cType;
+        int i;
+
+        sourceRow = sht.getRow(pRow);
+
+        sht.shiftRows(pRow + 1, sht.getLastRowNum(), intlenth, true, false);
+
+        targetRow = sht.createRow(pRow + 1);
+
+        targetRow.setHeight(sourceRow.getHeight());
+        for (i = sourceRow.getFirstCellNum(); i <= sourceRow.getLastCellNum(); i++) {
+            sourceCell = sourceRow.getCell(i);
+            if (sourceCell == null) {
+                continue;
+            }
+            targetCell = targetRow.createCell(i);
+            targetCell.setCellStyle(sourceCell.getCellStyle());
+            cType = sourceCell.getCellType();
+            targetCell.setCellType(cType);
+
+            switch (cType) {
+                case XSSFCell.CELL_TYPE_BOOLEAN:
+                    targetCell.setCellValue(sourceCell.getBooleanCellValue());
+                    break;
+                case XSSFCell.CELL_TYPE_ERROR:
+                    targetCell.setCellErrorValue(sourceCell.getErrorCellValue());
+                    break;
+                case XSSFCell.CELL_TYPE_FORMULA:
+                    targetCell.setCellFormula(parseFormula(sourceCell
+                            .getCellFormula()));
+                    break;
+                case XSSFCell.CELL_TYPE_NUMERIC:
+                    targetCell.setCellValue(sourceCell.getNumericCellValue());
+                    break;
+                case XSSFCell.CELL_TYPE_STRING:
+                    targetCell.setCellValue(sourceCell.getRichStringCellValue());
+                    break;
+            }
+        }
+    }
+
+    /**
+     * parseFormula
+     */
+    private static String parseFormula(String pPOIFormula) {
+        final String cstReplaceString = "ATTR(semiVolatile)";
+        StringBuffer result = null;
+        int index;
+        result = new StringBuffer();
+        index = pPOIFormula.indexOf(cstReplaceString);
+        if (index >= 0) {
+            result.append(pPOIFormula.substring(0, index));
+            result.append(pPOIFormula.substring(index
+                    + cstReplaceString.length()));
+        } else {
+            result.append(pPOIFormula);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * 转换成UTF8格式
+     *
+     */
+    public static String toUtf8String(String s) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= 0 && c <= 255) {
+                sb.append(c);
+            } else {
+                byte[] b;
+                try {
+                    b = Character.toString(c).getBytes("utf-8");
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                    b = new byte[0];
+                }
+                for (int j = 0; j < b.length; j++) {
+                    int k = b[j];
+                    if (k < 0)
+                        k += 256;
+                    sb.append("%" + Integer.toHexString(k).toUpperCase());
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String getXCellVal(XSSFCell cell) {
+
+        String val = null;
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd"); //日期格式yyyy-mm-dd
+        DecimalFormat df = new DecimalFormat("0");             //数字格式，防止长数字成为科学计数法形式，或者int变为double形式
+
+        switch (cell.getCellType()) {
+            case XSSFCell.CELL_TYPE_NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    val = fmt.format(cell.getDateCellValue()); //日期型
+                } else {
+                    val = df.format(cell.getNumericCellValue()); //数字型
+                }
+                break;
+            case XSSFCell.CELL_TYPE_STRING: //文本类型
+                val = cell.getStringCellValue();
+                break;
+            case XSSFCell.CELL_TYPE_BOOLEAN: //布尔型
+                val = String.valueOf(cell.getBooleanCellValue());
+                break;
+            case XSSFCell.CELL_TYPE_BLANK: //空白
+                val = cell.getStringCellValue();
+                break;
+            case XSSFCell.CELL_TYPE_ERROR: //错误
+                val = "错误";
+                break;
+            case XSSFCell.CELL_TYPE_FORMULA: //公式
+                try {
+                    val = String.valueOf(cell.getStringCellValue());
+                } catch (IllegalStateException e) {
+                    val = String.valueOf(cell.getNumericCellValue());
+                }
+                break;
+            default:
+                val = cell.getRichStringCellValue() == null ? null
+                        : cell.getRichStringCellValue().toString();
+        }
+        return val;
     }
 }

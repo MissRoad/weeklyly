@@ -1,14 +1,11 @@
 package com.ruoyi.system.service.impl;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.GeneralDataConstants;
-import com.ruoyi.common.json.JSONObject;
-import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.DateUtilsPlus;
+import com.ruoyi.common.utils.ExcelUtil;
 import com.ruoyi.system.domain.GeneralData;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.Weekly;
@@ -18,13 +15,22 @@ import com.ruoyi.system.mapper.WeeklyMapper;
 import com.ruoyi.system.service.IWeeklyService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
-import org.checkerframework.checker.units.qual.A;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -46,17 +52,6 @@ public class WeeklyServiceImpl implements IWeeklyService {
     private GeneralDataMapper generalDataMapper;
 
     /**
-     * 查询周报信息
-     *
-     * @param id 周报ID
-     * @return 周报信息
-     */
-    @Override
-    public Weekly selectWeeklyById(Integer id) {
-        return weeklyMapper.selectWeeklyById(id);
-    }
-
-    /**
      * 查询周报列表
      *
      * @param uid       uid
@@ -67,39 +62,6 @@ public class WeeklyServiceImpl implements IWeeklyService {
     @Override
     public List<Weekly> selectWeeklyList(Integer uid, Date startDate, Date endDate) {
         return weeklyMapper.selectWeeklyList(uid, startDate, endDate);
-    }
-
-    /**
-     * 新增周报
-     *
-     * @param weekly 周报信息
-     * @return 结果
-     */
-    @Override
-    public int insertWeekly(Weekly weekly) {
-        return weeklyMapper.insertWeekly(weekly);
-    }
-
-    /**
-     * 修改周报
-     *
-     * @param weekly 周报信息
-     * @return 结果
-     */
-    @Override
-    public int updateWeekly(Weekly weekly) {
-        return weeklyMapper.updateWeekly(weekly);
-    }
-
-    /**
-     * 删除周报对象
-     *
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeeklyByIds(String ids) {
-        return weeklyMapper.deleteWeeklyByIds(Convert.toStrArray(ids));
     }
 
     @Override
@@ -194,6 +156,99 @@ public class WeeklyServiceImpl implements IWeeklyService {
             week.add(weekly);
         }
         return week;
+    }
+
+    @Override
+    public void exportExcel(WeeklyDto weeklyDto, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //根据条件查询的周报结果
+        List<List<WeeklyDto>> weekly = this.getWeekly(weeklyDto);
+        String classPath = request.getSession(false).getServletContext().getRealPath("/");
+        classPath = URLDecoder.decode(classPath, "UTF-8");
+        File file = ResourceUtils.getFile("classpath:static/template/weekly_template.xlsx");
+        FileInputStream is = new FileInputStream(file);
+        //创建excel文件
+        XSSFWorkbook workbook = new XSSFWorkbook(is);
+        for (int i = 0; i < weekly.size(); i++) {
+            String name = weekly.get(i).get(0).getName();
+            Date time = weekly.get(i).get(0).getTime();
+            //创建一个excel的sheet
+            XSSFSheet sheet = workbook.cloneSheet(i);
+            //设置当前sheet名
+            workbook.setSheetName(i + 1, name);
+            //设置姓名
+            XSSFRow row1 = sheet.getRow(0);
+            XSSFCell cell = row1.getCell(1);
+            sheet.getRow(0).getCell(1).setCellValue(name);
+            //设置期间
+            sheet.getRow(1).getCell(1).setCellValue(DateUtilsPlus.getMondayOrSunday(time, DateUtilsPlus.MONDAY));
+            sheet.getRow(1).getCell(3).setCellValue(DateUtilsPlus.getMondayOrSunday(time, DateUtilsPlus.SUNDAY));
+            //定义从第几行开始插
+            int rowNum = 3;
+            for (WeeklyDto r : weekly.get(i)) {
+                ExcelUtil.copyRows(sheet, rowNum, 1);
+                XSSFRow row = sheet.getRow(rowNum);
+                //日期
+                row.getCell(0).setCellValue(r.getTime());
+                //星期
+                row.getCell(1).setCellValue(r.getWhichDay());
+                //项目/客户
+                row.getCell(2).setCellValue(r.getProject());
+                //项目区分
+                row.getCell(3).setCellValue(r.getProjectDetail());
+                //作业区分
+                row.getCell(4).setCellValue(r.getJobDetail());
+                //作业内容描述
+                row.getCell(5).setCellValue(r.getDescription());
+                //工时（h）
+                row.getCell(6).setCellValue(r.getWorkHours());
+                //课题及问题点
+                row.getCell(7).setCellValue(r.getProblem());
+                rowNum = rowNum + 1;
+            }
+        }
+        workbook.removeSheetAt(0);
+        response.reset();
+        OutputStream out = response.getOutputStream();
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/vdn.ms-excel");
+        String fileName = ExcelUtil.toUtf8String("周报_" + DateUtils.dateTimeNow(DateUtils.YYYYMMDDHHMMSS) + ".xlsx");
+        response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+        workbook.write(out);
+        out.flush();
+        out.close();
+    }
+
+    @Override
+    public List<List<WeeklyDto>> getWeekly(WeeklyDto weeklyDto) {
+        List<WeeklyDto> weeklyDtoList = weeklyMapper.selectWeekly(weeklyDto);
+        List<List<WeeklyDto>> weeks = Lists.newArrayList();
+        List<GeneralData> projects = generalDataMapper.selectGeneralByType(GeneralDataConstants.PRO_DIS);
+        List<GeneralData> jobs = generalDataMapper.selectGeneralByType(GeneralDataConstants.JOB_DIS);
+        HashSet<Integer> uid = Sets.newHashSet();
+        weeklyDtoList.forEach(r -> {
+            if (!uid.contains(uid)) {
+                uid.add(r.getUid());
+            }
+        });
+        uid.forEach(r -> {
+            List<WeeklyDto> list = Lists.newArrayList();
+            weeklyDtoList.forEach(w -> {
+                if (r.equals(w.getUid())) {
+                    projects.stream().filter(n -> n.getGeneralKey().equals(w.getProjectDist().toString())).
+                            collect(Collectors.toList()).forEach(n -> {
+                        w.setProjectDetail(n.getValue());
+                    });
+                    jobs.stream().filter(n -> n.getGeneralKey().equals(w.getJobDist().toString())).
+                            collect(Collectors.toList()).forEach(n -> {
+                        w.setJobDetail(n.getValue());
+                    });
+                    w.setWhichDay(DateUtilsPlus.getDay(w.getTime()));
+                    list.add(w);
+                }
+            });
+            weeks.add(list);
+        });
+        return weeks;
     }
 
 }

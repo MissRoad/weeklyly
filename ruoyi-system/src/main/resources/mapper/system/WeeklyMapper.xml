@@ -121,6 +121,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="uid!=null and uid!=''">
             AND w.uid=#{uid}
         </if>
+        <if test="weekType!=null and weekType!=''">
+          AND w.week_type=#{weekType}
+        </if>
         ORDER BY w.time desc
     </select>
     

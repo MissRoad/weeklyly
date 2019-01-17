@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 
@@ -108,5 +110,30 @@ public class WeeklyController extends BaseController {
         model.addAttribute("projects", projects);
         model.addAttribute("jobs", jobs);
         return prefix + "/template";
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param request
+     * @param response
+     */
+    @GetMapping("export_excel")
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response, WeeklyDto weeklyDto) {
+        boolean success = true;
+        try {
+            weeklyService.exportExcel(weeklyDto, request, response);
+        } catch (Exception e) {
+            success = false;
+            e.printStackTrace();
+        } finally {
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("test")
+    public List<List<WeeklyDto>> test(WeeklyDto weeklyDto){
+        List<List<WeeklyDto>> weekly = weeklyService.getWeekly(weeklyDto);
+        return weekly;
     }
 }
