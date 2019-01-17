@@ -162,8 +162,6 @@ public class WeeklyServiceImpl implements IWeeklyService {
     public void exportExcel(WeeklyDto weeklyDto, HttpServletRequest request, HttpServletResponse response) throws Exception {
         //根据条件查询的周报结果
         List<List<WeeklyDto>> weekly = this.getWeekly(weeklyDto);
-        String classPath = request.getSession(false).getServletContext().getRealPath("/");
-        classPath = URLDecoder.decode(classPath, "UTF-8");
         File file = ResourceUtils.getFile("classpath:static/template/weekly_template.xlsx");
         FileInputStream is = new FileInputStream(file);
         //创建excel文件
