@@ -43,8 +43,9 @@ public class Global
         {
             synchronized (Global.class)
             {
-                if (global == null)
+                if (global == null) {
                     global = new Global();
+                }
             }
         }
         return global;

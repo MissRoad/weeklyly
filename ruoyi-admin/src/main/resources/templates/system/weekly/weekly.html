@@ -29,6 +29,12 @@
                             <a class="btn btn-primary btn-rounded btn-sm"><i class="fa fa-search"></i>&nbsp;搜索</a>
                             <a class="btn btn-warning btn-rounded btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
+                        <li>
+                            <button class="btn btn-default btn-outline dropdown-toggle" id="export_excel" title="导出Excel" type="button">
+                                <i class="glyphicon glyphicon glyphicon-save"></i>
+                                <span class="caret"></span>
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </form>
@@ -44,8 +50,7 @@
                         <div class="layui-btn-container">
                             <a href="javaScript:void(0)" th:each="user:${week.user}"
                                th:attr="data-uid=${user.userId},data-time=${week.timeLine},data-name=${user.userName}"
-                               th:text="${user.userName}"
-                               class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
+                               th:text="${user.userName}" class="layui-btn layui-btn-primary layui-btn-sm">张三</a>
                         </div>
                     </div>
                 </li>
@@ -93,6 +98,20 @@
             });
         });
 
+        //点击导出按钮
+        $('#export_excel').click(function () {
+
+            //页面层-自定义
+
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                shadeClose: true,
+                skin: 'yourclass',
+                content: '自定义HTML内容'
+            });
+        })
     })
 </script>
 </body>

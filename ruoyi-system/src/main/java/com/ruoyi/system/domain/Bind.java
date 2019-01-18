@@ -64,26 +64,31 @@ public class Bind extends BaseEntity
 	{
 		return flUserCode;
 	}
-	public void setCreateTime(Date createTime) 
+	@Override
+	public void setCreateTime(Date createTime)
 	{
 		this.createTime = createTime;
 	}
 
-	public Date getCreateTime() 
+	@Override
+	public Date getCreateTime()
 	{
 		return createTime;
 	}
-	public void setUpdateTime(Date updateTime) 
+	@Override
+	public void setUpdateTime(Date updateTime)
 	{
 		this.updateTime = updateTime;
 	}
 
-	public Date getUpdateTime() 
+	@Override
+	public Date getUpdateTime()
 	{
 		return updateTime;
 	}
 
-    public String toString() {
+    @Override
+	public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
             .append("openid", getOpenid())

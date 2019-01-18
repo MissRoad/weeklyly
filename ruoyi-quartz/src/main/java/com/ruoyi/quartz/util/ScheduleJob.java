@@ -18,6 +18,8 @@ import com.ruoyi.quartz.domain.SysJob;
 import com.ruoyi.quartz.domain.SysJobLog;
 import com.ruoyi.quartz.service.ISysJobLogService;
 
+import static java.util.concurrent.Executors.*;
+
 /**
  * 定时任务处理
  * 
@@ -29,7 +31,7 @@ public class ScheduleJob extends QuartzJobBean
 {
     private static final Logger log = LoggerFactory.getLogger(ScheduleJob.class);
 
-    private ExecutorService service = Executors.newSingleThreadExecutor();
+    private ExecutorService service = newSingleThreadExecutor();
 
     private final static ISysJobLogService jobLogService = (ISysJobLogService) SpringContextUtil.getBean("sysJobLogServiceImpl");
 
